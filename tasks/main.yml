@@ -50,7 +50,7 @@
 - name: Add user to Docker group
   become: true
   ansible.builtin.user:
-    name: "{{ remote_user }}"
+    name: "{{ ansible_user_id }}"
     append: yes
     groups: docker
 ...
