@@ -49,6 +49,7 @@
 
 - name: Add user to Docker group
   become: true
+  gather_facts: true
   ansible.builtin.user:
     name: "{{ ansible_user_id }}"
     append: yes
