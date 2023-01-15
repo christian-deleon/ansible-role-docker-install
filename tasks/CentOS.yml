@@ -3,6 +3,7 @@
 - name: Adding Docker repsitory
   ansible.builtin.yum_repository:
     name: docker-ce
+    description: Docker-ce repsitory
     baseurl: https://download.docker.com/linux/centos/docker-ce.repo
 
 - name: Installing packages
