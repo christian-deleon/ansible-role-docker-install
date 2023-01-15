@@ -1,0 +1,21 @@
+# file: tasks/CentOS.yml
+---
+- name: Adding Docker repsitory
+  ansible.builtin.yum_repository:
+    name: docker-ce
+    baseurl: https://download.docker.com/linux/centos/docker-ce.repo
+
+- name: Installing packages
+  ansible.builtin.yum:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
+    state: present
+
+- name: Starting Docker service
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+...
