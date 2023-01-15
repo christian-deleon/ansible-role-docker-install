@@ -1,5 +1,10 @@
 # file: tasks/CentOS.yml
 ---
+- name: Installing yum-utils
+  ansible.builtin.yum:
+    name: yum-utils 
+    state: present
+
 - name: Setting mydistribution
   ansible.builtin.set_fact:
     mydistribution: "{{ 'rhel' if (ansible_distribution == 'Red Hat Enterprise Linux') else (ansible_distribution | lower) }}"
