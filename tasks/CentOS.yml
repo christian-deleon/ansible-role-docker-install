@@ -1,10 +1,22 @@
 # file: tasks/CentOS.yml
 ---
-- name: Adding Docker repsitory
+- name: Setting mydistribution
+  ansible.builtin.set_fact:
+    mydistribution: "{{ 'rhel' if (ansible_distribution == 'Red Hat Enterprise Linux') else (ansible_distribution | lower) }}"
+
+- name: Adding signing key
+  ansible.builtin.rpm_key:
+    key: "https://download.docker.com/linux/{{ mydistribution }}/gpg"
+    state: present
+
+- name: Adding repository into repo.d list
   ansible.builtin.yum_repository:
-    name: docker-ce
-    description: Docker-ce repsitory
-    baseurl: https://download.docker.com/linux/centos/docker-ce.repo
+    name: docker
+    description: docker repository
+    baseurl: "https://download.docker.com/linux/{{ mydistribution }}/$releasever/$basearch/stable"
+    enabled: true
+    gpgcheck: true
+    gpgkey: "https://download.docker.com/linux/{{ mydistribution }}/gpg"
 
 - name: Installing packages
   ansible.builtin.yum:
