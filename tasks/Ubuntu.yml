@@ -45,8 +45,11 @@
     state: latest
     update_cache: true
 
-- name: Install Docker Module for Python
+- name: Pip install Docker and Docker Compose
   become: true
   ansible.builtin.pip:
-    name: docker
+    name:
+      - docker
+      - docker-compose
+    state: latest
 ...
