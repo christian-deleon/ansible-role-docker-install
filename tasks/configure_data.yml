@@ -1,0 +1,50 @@
+# file: tasks/configure_data.yml
+---
+- name: Stop Docker Service
+  become: true
+  ansible.builtin.service:
+    name: docker.service
+    state: stopped
+
+- name: Stop Docker Socket
+  become: true
+  ansible.builtin.service:
+    name: docker.socket
+    state: stopped
+
+- name: Copy Docker daemon config
+  become: true
+  ansible.builtin.template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Move docker data dir to new location
+  become: true
+  ansible.builtin.command: mv /var/lib/docker {{ docker_data_dir }}
+
+- name: Symlink docker data dir to new location
+  become: true
+  ansible.builtin.file:
+    src: "{{ docker_data_dir }}"
+    dest: /var/lib/docker
+    state: link
+
+- name: Reload daemon
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Start Docker
+  become: true
+  ansible.builtin.service:
+    name: docker.socket
+    state: started
+
+- name: Start Docker Service
+  become: true
+  ansible.builtin.service:
+    name: docker.service
+    state: started

@@ -8,6 +8,18 @@
 - name: Add user to Docker group
   become: true
   ansible.builtin.user:
-    name: "{{ ansible_user_id }}"
+    name: "{{ ansible_user }}"
     append: true
     groups: docker
+
+- name: Configure Docker data directory
+  ansible.builtin.include_tasks: configure_data.yml
+  when: docker_data_dir != "/var/lib/docker"
+
+- name: Pip install Docker and Docker Compose
+  become: true
+  ansible.builtin.pip:
+    name:
+      - docker
+      - docker-compose
+    state: latest
