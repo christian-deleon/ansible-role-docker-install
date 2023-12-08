@@ -18,11 +18,17 @@
     dest: /etc/docker/daemon.json
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
 
-- name: Move docker data dir to new location
+- name: Move Docker data directory
   become: true
-  ansible.builtin.command: mv /var/lib/docker {{ docker_data_dir }}
+  ansible.builtin.file:
+    src: /var/lib/docker
+    dest: "{{ docker_data_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
 
 - name: Symlink docker data dir to new location
   become: true

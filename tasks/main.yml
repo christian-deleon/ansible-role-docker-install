@@ -14,11 +14,3 @@
 - name: Configure Docker data directory
   ansible.builtin.include_tasks: configure_data.yml
   when: docker_data_dir != "/var/lib/docker"
-
-- name: Pip install Docker and Docker Compose
-  become: true
-  ansible.builtin.pip:
-    name:
-      - docker
-      - docker-compose
-    state: latest

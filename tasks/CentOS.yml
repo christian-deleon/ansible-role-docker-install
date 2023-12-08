@@ -1,7 +1,7 @@
 ---
 - name: Installing yum-utils
   ansible.builtin.yum:
-    name: yum-utils 
+    name: yum-utils
     state: present
 
 - name: Setting mydistribution
@@ -28,6 +28,7 @@
       - docker-ce
       - docker-ce-cli
       - containerd.io
+      - docker-buildx-plugin
       - docker-compose-plugin
     state: present
 
