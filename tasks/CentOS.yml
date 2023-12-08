@@ -35,4 +35,3 @@
   ansible.builtin.systemd:
     name: docker
     state: started
-...
