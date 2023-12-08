@@ -1,4 +1,3 @@
-# file: tasks/Ubuntu.yml
 ---
 - name: Install aptitude
   become: true

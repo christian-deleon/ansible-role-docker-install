@@ -1,4 +1,3 @@
-# file: tasks/configure_data.yml
 ---
 - name: Stop Docker Service
   become: true

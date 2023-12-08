@@ -1,4 +1,3 @@
-# file: tasks/CentOS.yml
 ---
 - name: Installing yum-utils
   ansible.builtin.yum:
