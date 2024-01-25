@@ -1,4 +1,8 @@
 ---
+- name: Gather facts
+  ansible.builtin.setup:
+    gather_subset: min
+
 - name: Installing OS specific packages
   ansible.builtin.include_tasks: "{{ ansible_distribution | lower }}.yml"
 
