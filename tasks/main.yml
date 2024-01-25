@@ -1,6 +1,6 @@
 ---
 - name: Installing OS specific packages
-  ansible.builtin.include_tasks: "{{ ansible_distribution }}.yml"
+  ansible.builtin.include_tasks: "{{ ansible_distribution | lower }}.yml"
 
 - name: Add user to Docker group
   become: true
