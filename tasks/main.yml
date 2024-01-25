@@ -3,8 +3,13 @@
   ansible.builtin.setup:
     gather_subset: min
 
-- name: Installing OS specific packages
-  ansible.builtin.include_tasks: "{{ ansible_distribution | lower }}.yml"
+- name: Include OS specific packages when RedHat Distribution
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}.yml"
+  when: ansible_os_family == "RedHat"
+
+- name: Include OS specific packages for Ubuntu
+  ansible.builtin.include_tasks: ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
 
 - name: Add user to Docker group
   become: true

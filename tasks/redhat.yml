@@ -4,23 +4,27 @@
     name: yum-utils
     state: present
 
-- name: Setting mydistribution
+- name: Setting distribution (rhel if RedHat or centos if AlmaLinux or default to ansible_distribution | lower)
   ansible.builtin.set_fact:
-    mydistribution: "{{ 'rhel' if (ansible_distribution == 'Red Hat Enterprise Linux') else (ansible_distribution | lower) }}"
+    distribution: "{{ 'rhel' if ansible_distribution == 'RedHat' else 'centos' if ansible_distribution == 'AlmaLinux' else ansible_distribution | lower }}"
+
+- name: Debug distribution
+  ansible.builtin.debug:
+    msg: "{{ distribution }}"
 
 - name: Adding signing key
   ansible.builtin.rpm_key:
-    key: "https://download.docker.com/linux/{{ mydistribution }}/gpg"
+    key: "https://download.docker.com/linux/{{ distribution }}/gpg"
     state: present
 
 - name: Adding repository into repo.d list
   ansible.builtin.yum_repository:
     name: docker
     description: docker repository
-    baseurl: "https://download.docker.com/linux/{{ mydistribution }}/$releasever/$basearch/stable"
+    baseurl: "https://download.docker.com/linux/{{ distribution }}/$releasever/$basearch/stable"
     enabled: true
     gpgcheck: true
-    gpgkey: "https://download.docker.com/linux/{{ mydistribution }}/gpg"
+    gpgkey: "https://download.docker.com/linux/{{ distribution }}/gpg"
 
 - name: Installing packages
   ansible.builtin.yum:
