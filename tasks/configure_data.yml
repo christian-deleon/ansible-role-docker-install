@@ -1,4 +1,16 @@
 ---
+- name: Check if target directory exists and has data
+  become: true
+  ansible.builtin.stat:
+    path: "{{ docker_data_dir }}"
+  register: target_dir
+
+- name: Check if source directory has data
+  become: true
+  ansible.builtin.stat:
+    path: /var/lib/docker
+  register: source_dir
+
 - name: Stop Docker Service
   become: true
   ansible.builtin.service:
@@ -22,20 +34,22 @@
 
 - name: Move Docker data directory
   become: true
-  ansible.builtin.file:
-    src: /var/lib/docker
+  ansible.builtin.copy:
+    src: /var/lib/docker/
     dest: "{{ docker_data_dir }}"
-    state: directory
+    remote_src: true
     owner: root
     group: root
     mode: '0755'
+  when: not target_dir.stat.exists or (target_dir.stat.exists and target_dir.stat.size == 0)
 
-- name: Symlink docker data dir to new location
+- name: Create symlink to new Docker data directory
   become: true
   ansible.builtin.file:
     src: "{{ docker_data_dir }}"
     dest: /var/lib/docker
     state: link
+  when: not target_dir.stat.exists or (target_dir.stat.exists and target_dir.stat.size == 0)
 
 - name: Reload daemon
   become: true
