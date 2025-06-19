@@ -11,19 +11,7 @@
     path: /var/lib/docker
   register: source_dir
 
-- name: Stop Docker Service
-  become: true
-  ansible.builtin.service:
-    name: docker.service
-    state: stopped
-
-- name: Stop Docker Socket
-  become: true
-  ansible.builtin.service:
-    name: docker.socket
-    state: stopped
-
-- name: Copy Docker daemon config
+- name: Create Docker daemon config
   become: true
   ansible.builtin.template:
     src: daemon.json.j2
@@ -31,30 +19,48 @@
     owner: root
     group: root
     mode: '0644'
+  register: daemon_config
+
+- name: Stop Docker
+  when: daemon_config.changed or (source_dir.stat.exists and source_dir.stat.isdir and target_dir.stat.exists and not target_dir.stat.isdir)
+  block:
+    - name: Stop Docker Service
+      become: true
+      ansible.builtin.service:
+        name: docker.service
+        state: stopped
+
+    - name: Stop Docker Socket
+      become: true
+      ansible.builtin.service:
+        name: docker.socket
+        state: stopped
 
 - name: Move Docker data directory
-  become: true
-  ansible.builtin.copy:
-    src: /var/lib/docker/
-    dest: "{{ docker_data_dir }}"
-    remote_src: true
-    owner: root
-    group: root
-    mode: '0755'
-  when: not target_dir.stat.exists or (target_dir.stat.exists and target_dir.stat.size == 0)
+  when: source_dir.stat.exists and source_dir.stat.isdir and target_dir.stat.exists and not target_dir.stat.isdir
+  block:
+    - name: Move Docker data directory
+      become: true
+      ansible.builtin.copy:
+        src: /var/lib/docker/
+        dest: "{{ docker_data_dir }}"
+        remote_src: true
+        owner: root
+        group: root
+        mode: '0755'
 
-- name: Create symlink to new Docker data directory
-  become: true
-  ansible.builtin.file:
-    src: "{{ docker_data_dir }}"
-    dest: /var/lib/docker
-    state: link
-  when: not target_dir.stat.exists or (target_dir.stat.exists and target_dir.stat.size == 0)
+    - name: Create symlink to new Docker data directory
+      become: true
+      ansible.builtin.file:
+        src: "{{ docker_data_dir }}"
+        dest: /var/lib/docker
+        state: link
 
 - name: Reload daemon
   become: true
   ansible.builtin.systemd:
     daemon_reload: true
+  when: daemon_config.changed
 
 - name: Start Docker
   become: true
